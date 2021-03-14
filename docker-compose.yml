@@ -1,0 +1,13 @@
+version: '3'
+services:
+  db:
+    image: "postgres:13.2-alpine"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - data:/var/lib/postgresql/data
+volumes:
+  data:
+    driver: local

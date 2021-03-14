@@ -24,6 +24,7 @@ default: &default
 development:
   <<: *default
   database: rails_on_ecs_development
+  url: postgres://postgres:postgres@localhost:5432
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
