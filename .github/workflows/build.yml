@@ -1,0 +1,54 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  ECR_REPOSITORY: reireias2021-rails
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and Push
+        uses: docker/build-push-action@v2
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        with:
+          push: true
+          cache-from: |
+            type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:builder
+          tags: |
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+
+      - name: Save builder cache
+        uses: docker/build-push-action@v2
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        with:
+          target: builder
+          push: true
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+          tags: |
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:builder
