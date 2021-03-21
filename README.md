@@ -2,3 +2,5 @@
 
 # rails-on-ecs
 Example code for Ruby on Rails with AWS ECS.
+
+Terraform Repository: [reireias/rails-on-ecs-terraform](https://github.com/reireias/rails-on-ecs-terraform)
