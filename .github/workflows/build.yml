@@ -1,4 +1,4 @@
-name: deploy
+name: build
 
 on:
   push:
@@ -10,7 +10,7 @@ env:
   DOCKER_BUILDKIT: 1
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -52,29 +52,3 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
           tags: |
             ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:builder
-
-      - name: Download TaskDefinition and appspec
-        run: |
-          aws s3 cp s3://reireias2021.build/task_definition_app.json .
-          aws s3 cp s3://reireias2021.build/appspec.yml .
-
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        with:
-          task-definition: task_definition_app.json
-          container-name: web
-          image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-
-      - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          cluster: reireias2021-main
-          service: reireias2021-app
-          wait-for-service-stability: true
-          codedeploy-appspec: appspec.yml
-          codedeploy-application: reireias2021-app
-          codedeploy-deployment-group: reireias2021-app
