@@ -22,9 +22,15 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
-  <<: *default
-  database: rails_on_ecs_development
-  url: postgres://postgres:postgres@localhost:5432
+  primary:
+    <<: *default
+    database: rails_on_ecs_development
+    url: postgres://postgres:postgres@localhost:5432
+  primary_replica:
+    <<: *default
+    database: rails_on_ecs_development
+    url: postgres://postgres:postgres@localhost:54321
+    replica: true
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
