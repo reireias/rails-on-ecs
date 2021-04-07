@@ -95,14 +95,10 @@ test:
 #
 production:
   <<: *default
-  username: rails_on_ecs
-  password: <%= ENV['RAILS_ON_ECS_DATABASE_PASSWORD'] %>
   primary:
     <<: *default
-    database: rails_on_ecs_production
     url: <%= ENV['DATABASE_URL'] %>
   primary_replica:
     <<: *default
-    database: rails_on_ecs_production
     url: <%= ENV['READER_DATABASE_URL'] %>
     replica: true
