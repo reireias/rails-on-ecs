@@ -29,7 +29,7 @@ development:
   primary_replica:
     <<: *default
     database: rails_on_ecs_development
-    url: postgres://postgres:postgres@localhost:54321
+    url: postgres://postgres:postgres@localhost:5432
     replica: true
 
   # The specified database role being used to connect to postgres.
@@ -63,8 +63,15 @@ development:
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  <<: *default
-  database: rails_on_ecs_test
+  primary:
+    <<: *default
+    database: rails_on_ecs_test
+    url: <%= ENV['DATABASE_URL'] || 'postgres://postgres:postgres@localhost:5432' %>
+  primary_replica:
+    <<: *default
+    database: rails_on_ecs_test
+    url: <%= ENV['DATABASE_URL'] || 'postgres://postgres:postgres@localhost:5432' %>
+    replica: true
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -88,6 +95,14 @@ test:
 #
 production:
   <<: *default
-  database: rails_on_ecs_production
   username: rails_on_ecs
   password: <%= ENV['RAILS_ON_ECS_DATABASE_PASSWORD'] %>
+  primary:
+    <<: *default
+    database: rails_on_ecs_production
+    url: <%= ENV['DATABASE_URL'] %>
+  primary_replica:
+    <<: *default
+    database: rails_on_ecs_production
+    url: <%= ENV['READER_DATABASE_URL'] %>
+    replica: true
